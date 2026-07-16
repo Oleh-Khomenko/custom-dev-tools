@@ -90,5 +90,26 @@ export default function nuxtConventions(): Linter.Config[] {
         }],
       },
     },
+    {
+      name: 'nuxt-conventions/vue',
+      files: ['**/*.vue'],
+      rules: {
+        'vue/block-order': ['error', { order: ['script', 'template', 'style', 'i18n'] }],
+        'vue/component-api-style': ['error', ['script-setup']],
+        'vue/define-macros-order': ['error', { order: ['defineProps', 'defineEmits'] }],
+        'vue/require-typed-ref': 'error',
+        'vue/multi-word-component-names': 'off',
+      },
+    },
+    {
+      name: 'nuxt-conventions/import-order',
+      files: ['**/*.{ts,vue}'],
+      rules: {
+        'import/order': ['error', {
+          groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+          'newlines-between': 'ignore',
+        }],
+      },
+    },
   ]
 }

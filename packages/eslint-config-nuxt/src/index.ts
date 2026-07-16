@@ -1,5 +1,76 @@
 import type { Linter } from 'eslint'
 
+const HTTP_MESSAGE = 'HTTP calls live only in app/api/*.api.ts client modules.'
+const DB_MESSAGE = 'Database access lives only in server/services/*.service.ts.'
+const HTTP_CALLEES = ['$fetch', 'useFetch', 'useLazyFetch']
+
 export default function nuxtConventions(): Linter.Config[] {
-  return []
+  return [
+    {
+      name: 'nuxt-conventions/app-no-server-imports',
+      files: ['app/**/*.{ts,vue}'],
+      rules: {
+        'no-restricted-imports': ['error', {
+          patterns: [{
+            group: ['**/server/**'],
+            message: 'app/ must not import from server/. Share code via shared/.',
+          }],
+        }],
+      },
+    },
+    {
+      name: 'nuxt-conventions/server-no-app-imports',
+      files: ['server/**/*.ts'],
+      rules: {
+        'no-restricted-imports': ['error', {
+          patterns: [{
+            group: ['**/app/**', '~/**'],
+            message: 'server/ must not import from app/. Share code via shared/.',
+          }],
+        }],
+      },
+    },
+    {
+      name: 'nuxt-conventions/shared-standalone',
+      files: ['shared/**/*.ts'],
+      rules: {
+        'no-restricted-imports': ['error', {
+          patterns: [{
+            group: ['**/app/**', '**/server/**', '~/**', '~~/**', '#imports'],
+            message: 'shared/ must not depend on app/ or server/.',
+          }],
+        }],
+      },
+    },
+    {
+      name: 'nuxt-conventions/http-only-in-api-client',
+      files: [
+        'app/components/**/*.{ts,vue}',
+        'app/pages/**/*.vue',
+        'app/layouts/**/*.vue',
+        'app/stores/**/*.ts',
+        'app/composables/**/*.ts',
+      ],
+      rules: {
+        'no-restricted-syntax': [
+          'error',
+          ...HTTP_CALLEES.map(callee => ({
+            selector: `CallExpression[callee.name='${callee}']`,
+            message: HTTP_MESSAGE,
+          })),
+        ],
+      },
+    },
+    {
+      name: 'nuxt-conventions/db-only-in-services',
+      files: ['server/**/*.ts'],
+      ignores: ['server/services/**'],
+      rules: {
+        'no-restricted-syntax': ['error', {
+          selector: 'CallExpression[callee.name=/^serverSupabase/]',
+          message: DB_MESSAGE,
+        }],
+      },
+    },
+  ]
 }

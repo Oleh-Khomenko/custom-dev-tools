@@ -1,0 +1,13 @@
+{
+  "name": "custom-dev-tools",
+  "owner": {
+    "name": "Oleh Khomenko"
+  },
+  "plugins": [
+    {
+      "name": "nuxt-conventions",
+      "source": "./plugins/nuxt-conventions",
+      "description": "Nuxt layer-architecture conventions: style-guide skill and /nuxt-review command"
+    }
+  ]
+}

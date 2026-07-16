@@ -1,0 +1,5 @@
+{
+  "name": "custom-dev-tools",
+  "private": true,
+  "packageManager": "pnpm@10.12.1"
+}

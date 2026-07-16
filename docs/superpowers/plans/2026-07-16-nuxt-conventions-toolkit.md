@@ -927,13 +927,20 @@ git add -A && git commit -m "Add marketplace manifest and readmes"
 Run: `cd /Users/oleghomenko/custom-dev-tools/packages/eslint-config-nuxt && pnpm build`
 
 Scratch config (vue/import-order objects excluded — the scratch run has no
-vue/import plugins; they are covered by unit tests):
+vue/import plugins; they are covered by unit tests). A TS parser is required:
+ESLint skips ALL rules (including filename rules) on files that fail to
+parse, and the target files use TS syntax. Consumers get the parser from
+`@nuxt/eslint`; the scratch run borrows it from the package's devDependencies:
 ```js
 // fu-eslint.config.mjs
+import tsParser from '/Users/oleghomenko/custom-dev-tools/packages/eslint-config-nuxt/node_modules/@typescript-eslint/parser/dist/index.js'
 import nuxtConventions from '/Users/oleghomenko/custom-dev-tools/packages/eslint-config-nuxt/dist/index.js'
 
 const skip = new Set(['nuxt-conventions/vue', 'nuxt-conventions/import-order'])
-export default nuxtConventions().filter(c => !skip.has(c.name))
+export default [
+  { files: ['**/*.ts'], languageOptions: { parser: tsParser } },
+  ...nuxtConventions().filter(c => !skip.has(c.name)),
+]
 ```
 
 - [ ] **Step 2: Run against freelance-unity's ts sources**
@@ -945,7 +952,7 @@ cd /Users/oleghomenko/freelance-unity && npx eslint \
   --config /private/tmp/claude-501/-Users-oleghomenko-event-invite-app/cb791d16-9f87-40b1-a970-ef5643eeab3d/scratchpad/fu-eslint.config.mjs \
   "app/api/**/*.ts" "app/queries/**/*.ts" "server/services/**/*.ts" || true
 ```
-Expected: exits with violations, including `app/api/countries.ts` (filename: missing `.api` suffix) and `app/queries/message-cache.ts` (missing `.queries` suffix). No parser crashes (these dirs contain type-light TS; if TS-syntax parse errors appear, they are acceptable for this smoke run as long as the two known filename findings are produced).
+Expected: exits with violations, including `app/api/countries.ts` (filename: missing `.api` suffix) and `app/queries/message-cache.ts` (missing `.queries` suffix). No parse errors (the scratch config provides the TS parser).
 
 - [ ] **Step 3: Confirm conforming files stay clean**
 
@@ -959,6 +966,12 @@ cd /Users/oleghomenko/custom-dev-tools && git add -A && git commit -m "Record ve
 ```
 
 ---
+
+## Verification
+
+2026-07-16: Ran the built package against freelance-unity (Task 9). Confirmed: `app/api/countries.ts` flagged for missing `.api` suffix and `app/queries/message-cache.ts` flagged for missing `.queries` suffix; `app/api/wallet.api.ts` and `server/services/wallet.service.ts` stayed clean; no parse errors.
+
+2026-07-16: Re-ran with `server/api/**/*.ts` and `server/utils/**/*.ts` added to the globs, after narrowing the `serverSupabase*` selector to `serverSupabase(Client|ServiceRole)`. The two filename findings still fire. `server/utils/require-auth.ts` (calls `serverSupabaseUser`) is no longer flagged by `no-restricted-syntax`. 40 true-positive `db-only-in-services` findings remain across 37 `server/api/**` handlers that call `serverSupabaseClient` directly (the reference repo predates its own idealized service-layer convention).
 
 ## Not in this plan (manual follow-ups)
 

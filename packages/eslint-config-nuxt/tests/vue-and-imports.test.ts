@@ -73,6 +73,28 @@ describe('vue conventions', () => {
     const messages = await lintCode(code, 'app/components/common/Card.vue')
     expect(ruleIds(messages)).not.toContain('vue/attributes-order')
   })
+
+  it('flags runtime/array defineEmits', async () => {
+    const code = '<script setup lang="ts">\nconst emit = defineEmits([\'close\'])\n</script>\n<template>\n  <div />\n</template>\n'
+    expect(ruleIds(await lintCode(code, 'app/components/common/Card.vue'))).toContain('vue/define-emits-declaration')
+  })
+
+  it('accepts type-based defineEmits', async () => {
+    const code = '<script setup lang="ts">\nconst emit = defineEmits<{ close: [] }>()\n</script>\n<template>\n  <div />\n</template>\n'
+    const messages = await lintCode(code, 'app/components/common/Card.vue')
+    expect(ruleIds(messages)).not.toContain('vue/define-emits-declaration')
+  })
+
+  it('flags an emitted event not declared in defineEmits', async () => {
+    const code = '<script setup lang="ts">\nconst emit = defineEmits<{ close: [] }>()\n</script>\n<template>\n  <div @click="$emit(\'open\')" />\n</template>\n'
+    expect(ruleIds(await lintCode(code, 'app/components/common/Card.vue'))).toContain('vue/require-explicit-emits')
+  })
+
+  it('accepts an emitted event declared in defineEmits', async () => {
+    const code = '<script setup lang="ts">\nconst emit = defineEmits<{ close: [] }>()\n</script>\n<template>\n  <div @click="$emit(\'close\')" />\n</template>\n'
+    const messages = await lintCode(code, 'app/components/common/Card.vue')
+    expect(ruleIds(messages)).not.toContain('vue/require-explicit-emits')
+  })
 })
 
 describe('import order', () => {
@@ -84,5 +106,16 @@ describe('import order', () => {
   it('flags duplicate imports from the same module', async () => {
     const code = "import { a } from './x'\nimport { b } from './x'\nexport const y = [a, b]\n"
     expect(ruleIds(await lintCode(code, 'shared/helpers/combine.ts'))).toContain('import/no-duplicates')
+  })
+
+  it('flags a relative import placed before an aliased ~/ import (pathGroups)', async () => {
+    const code = "import { helper } from './helper'\nimport { useForm } from '~/composables/use-form'\nexport const x = [helper, useForm]\n"
+    expect(ruleIds(await lintCode(code, 'misc/combine.ts'))).toContain('import/order')
+  })
+
+  it('accepts an aliased ~/ import placed before a relative import (pathGroups)', async () => {
+    const code = "import { useForm } from '~/composables/use-form'\nimport { helper } from './helper'\nexport const x = [helper, useForm]\n"
+    const messages = await lintCode(code, 'misc/combine.ts')
+    expect(ruleIds(messages)).not.toContain('import/order')
   })
 })

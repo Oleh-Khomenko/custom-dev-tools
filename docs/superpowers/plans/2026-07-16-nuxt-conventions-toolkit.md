@@ -933,7 +933,7 @@ parse, and the target files use TS syntax. Consumers get the parser from
 `@nuxt/eslint`; the scratch run borrows it from the package's devDependencies:
 ```js
 // fu-eslint.config.mjs
-import tsParser from '/Users/oleghomenko/custom-dev-tools/node_modules/@typescript-eslint/parser/dist/index.js'
+import tsParser from '/Users/oleghomenko/custom-dev-tools/packages/eslint-config-nuxt/node_modules/@typescript-eslint/parser/dist/index.js'
 import nuxtConventions from '/Users/oleghomenko/custom-dev-tools/packages/eslint-config-nuxt/dist/index.js'
 
 const skip = new Set(['nuxt-conventions/vue', 'nuxt-conventions/import-order'])
@@ -970,6 +970,8 @@ cd /Users/oleghomenko/custom-dev-tools && git add -A && git commit -m "Record ve
 ## Verification
 
 2026-07-16: Ran the built package against freelance-unity (Task 9). Confirmed: `app/api/countries.ts` flagged for missing `.api` suffix and `app/queries/message-cache.ts` flagged for missing `.queries` suffix; `app/api/wallet.api.ts` and `server/services/wallet.service.ts` stayed clean; no parse errors.
+
+2026-07-16: Re-ran with `server/api/**/*.ts` and `server/utils/**/*.ts` added to the globs, after narrowing the `serverSupabase*` selector to `serverSupabase(Client|ServiceRole)`. The two filename findings still fire. `server/utils/require-auth.ts` (calls `serverSupabaseUser`) is no longer flagged by `no-restricted-syntax`. 40 true-positive `db-only-in-services` findings remain across 37 `server/api/**` handlers that call `serverSupabaseClient` directly (the reference repo predates its own idealized service-layer convention).
 
 ## Not in this plan (manual follow-ups)
 

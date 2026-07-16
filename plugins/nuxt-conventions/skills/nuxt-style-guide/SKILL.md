@@ -96,3 +96,9 @@ duplicate a type on one side — import it from `shared/`.
   colors or font sizes in components.
 - Before creating a component, check `app/components/common/` for one that
   already fits (Button, Input, Select, Modal, Toast, ...).
+
+## Tooling
+
+- The companion ESLint config's `@stylistic/member-delimiter-style` rule
+  requires enabling `@nuxt/eslint`'s stylistic feature
+  (`eslint: { config: { stylistic: true } }` in `nuxt.config.ts`).

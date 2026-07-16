@@ -1,5 +1,7 @@
 import { ESLint, type Linter } from 'eslint'
 import tsParser from '@typescript-eslint/parser'
+import tsPlugin from '@typescript-eslint/eslint-plugin'
+import stylistic from '@stylistic/eslint-plugin'
 import vuePlugin from 'eslint-plugin-vue'
 import vueParser from 'vue-eslint-parser'
 import importX from 'eslint-plugin-import-x'
@@ -23,7 +25,7 @@ function baseConfig(): Linter.Config[] {
     },
     {
       files: ['**/*.{ts,vue}'],
-      plugins: { import: importX as never },
+      plugins: { import: importX as never, '@typescript-eslint': tsPlugin as never, '@stylistic': stylistic as never },
     },
   ]
 }

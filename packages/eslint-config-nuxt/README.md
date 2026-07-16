@@ -18,3 +18,11 @@ import nuxtConventions from '@oleh-khomenko/eslint-config-nuxt'
 
 export default withNuxt(...nuxtConventions())
 ```
+
+### Stylistic requirement
+
+`@stylistic/member-delimiter-style` requires the consumer to enable
+`@nuxt/eslint`'s stylistic feature in `nuxt.config.ts`:
+`eslint: { config: { stylistic: true } }`. Without it ESLint will error
+that the rule is undefined — that loud failure is intentional (don't
+silently skip it).

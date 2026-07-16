@@ -99,15 +99,63 @@ export default function nuxtConventions(): Linter.Config[] {
         'vue/define-macros-order': ['error', { order: ['defineProps', 'defineEmits'] }],
         'vue/require-typed-ref': 'error',
         'vue/multi-word-component-names': 'off',
+        'vue/define-props-declaration': ['error', 'type-based'],
+        'vue/define-emits-declaration': ['error', 'type-based'],
+        'vue/require-explicit-emits': 'error',
+        'vue/html-self-closing': ['error', { html: { void: 'always', normal: 'always', component: 'always' } }],
+        'vue/attribute-hyphenation': ['error', 'always'],
+        'vue/v-on-event-hyphenation': ['error', 'always'],
+        'vue/attributes-order': ['error', { alphabetical: false, order: [
+          'CONTENT',              // v-html / v-text — defines whole component content, FIRST
+          'DEFINITION',           // is, v-is
+          'LIST_RENDERING',       // v-for
+          'CONDITIONALS',         // v-if / v-else / v-show
+          'RENDER_MODIFIERS',     // v-pre / v-once
+          'OTHER_DIRECTIVES',     // custom v-*
+          'ATTR_SHORTHAND_BOOL',  // boolProp shorthand
+          'GLOBAL',               // id
+          'ATTR_STATIC',          // class="", type=""
+          'UNIQUE',               // ref, key
+          'SLOT',                 // v-slot
+          'TWO_WAY_BINDING',      // v-model
+          'ATTR_DYNAMIC',         // :foo
+          'EVENTS',               // @click
+        ] }],
       },
     },
     {
       name: 'nuxt-conventions/import-order',
       files: ['**/*.{ts,vue}'],
       rules: {
+        'import/no-duplicates': 'error',
         'import/order': ['error', {
           groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+          pathGroups: [
+            { pattern: '#imports', group: 'internal', position: 'before' },
+            { pattern: '#shared/**', group: 'internal', position: 'before' },
+            { pattern: '~/**', group: 'internal' },
+            { pattern: '~~/**', group: 'internal' },
+          ],
+          pathGroupsExcludedImportTypes: ['type'],
           'newlines-between': 'ignore',
+        }],
+      },
+    },
+    {
+      name: 'nuxt-conventions/typescript',
+      files: ['**/*.{ts,vue}'],
+      rules: {
+        '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports', fixStyle: 'separate-type-imports' }],
+        '@typescript-eslint/no-explicit-any': 'error',
+      },
+    },
+    {
+      name: 'nuxt-conventions/stylistic',
+      files: ['**/*.{ts,vue}'],
+      rules: {
+        '@stylistic/member-delimiter-style': ['error', {
+          multiline: { delimiter: 'semi', requireLast: true },
+          singleline: { delimiter: 'semi', requireLast: false },
         }],
       },
     },

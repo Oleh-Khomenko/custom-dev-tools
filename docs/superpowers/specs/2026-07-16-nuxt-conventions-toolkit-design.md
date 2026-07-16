@@ -59,7 +59,7 @@ Exports a factory returning an array of flat-config objects, so projects can pas
 
 ### Rules
 
-**File naming** (`unicorn/filename-case` with per-directory overrides):
+**File naming** (`check-file/filename-naming-convention` with per-directory globs — unicorn can't enforce suffixes like `*.api.ts`):
 
 | Path | Case | Pattern |
 |---|---|---|
@@ -70,7 +70,7 @@ Exports a factory returning an array of flat-config objects, so projects can pas
 | `server/services/**` | kebab-case | `*.service.ts` |
 | `app/utils/**`, `shared/**` | kebab-case | — |
 
-**Layer boundaries** (`eslint-plugin-boundaries` + `no-restricted-imports` / `no-restricted-syntax`):
+**Layer boundaries** (path-scoped `no-restricted-imports` / `no-restricted-syntax`; `eslint-plugin-boundaries` dropped — alias resolution makes it brittle, and all our rules are path-pattern based):
 
 - `$fetch` / `useFetch` / `$api` calls forbidden in components, stores, composables — HTTP lives only in `app/api/*.api.ts`.
 - `serverSupabaseClient` / `serverSupabaseServiceRole` (and DB access generally) allowed only in `server/services/**`; route handlers stay thin.
@@ -87,7 +87,7 @@ Exports a factory returning an array of flat-config objects, so projects can pas
 
 ### Dependencies
 
-Peer: `eslint >= 9`. Direct: `eslint-plugin-unicorn`, `eslint-plugin-boundaries`, `eslint-plugin-import-x`. Vue rules assume `@nuxt/eslint` is present in the consumer (it ships `eslint-plugin-vue`); the factory only adds/overrides rule severities, it does not re-register the vue plugin.
+Peer: `eslint >= 9`. Direct: `eslint-plugin-check-file` only. Vue and import-order rules assume `@nuxt/eslint` is present in the consumer (it ships `eslint-plugin-vue` and registers the import plugin); the factory only sets rule severities, it does not re-register those plugins.
 
 ### Publishing
 

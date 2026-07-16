@@ -99,6 +99,8 @@ duplicate a type on one side — import it from `shared/`.
 
 ## Tooling
 
-- The companion ESLint config's `@stylistic/member-delimiter-style` rule
-  requires enabling `@nuxt/eslint`'s stylistic feature
-  (`eslint: { config: { stylistic: true } }` in `nuxt.config.ts`).
+- The companion ESLint config needs `@nuxt/eslint`'s `stylistic` and
+  `typescript` features enabled in `nuxt.config.ts`:
+  `eslint: { config: { stylistic: true, typescript: true } }`. The
+  `typescript` feature registers the `@typescript-eslint` plugin the
+  config's type rules depend on; `stylistic` registers `@stylistic`.

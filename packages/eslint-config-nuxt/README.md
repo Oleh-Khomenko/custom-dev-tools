@@ -19,10 +19,16 @@ import nuxtConventions from '@oleh-khomenko/eslint-config-nuxt'
 export default withNuxt(...nuxtConventions())
 ```
 
-### Stylistic requirement
+### Required `@nuxt/eslint` features
 
-`@stylistic/member-delimiter-style` requires the consumer to enable
-`@nuxt/eslint`'s stylistic feature in `nuxt.config.ts`:
-`eslint: { config: { stylistic: true } }`. Without it ESLint will error
-that the rule is undefined — that loud failure is intentional (don't
-silently skip it).
+Enable both the `stylistic` and `typescript` features in `nuxt.config.ts`:
+
+```ts
+eslint: { config: { stylistic: true, typescript: true } }
+```
+
+`@nuxt/eslint` registers `vue`, `import` and (with `stylistic`) `@stylistic`
+by default, but registers the `@typescript-eslint` plugin only when the
+`typescript` feature is on. Without these, ESLint errors that
+`@typescript-eslint/*` and `@stylistic/member-delimiter-style` are
+undefined — that loud failure is intentional (don't silently skip it).

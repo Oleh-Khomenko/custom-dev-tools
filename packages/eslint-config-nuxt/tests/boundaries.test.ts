@@ -70,4 +70,28 @@ describe('layer boundaries', () => {
     )
     expect(ruleIds(messages)).not.toContain('no-restricted-syntax')
   })
+
+  it('forbids useFetch in a .vue page', async () => {
+    const messages = await lintCode(
+      "<script setup lang=\"ts\">\nconst { data } = useFetch('/api/wallet')\n</script>\n<template>\n  <div>{{ data }}</div>\n</template>\n",
+      'app/pages/index.vue',
+    )
+    expect(ruleIds(messages)).toContain('no-restricted-syntax')
+  })
+
+  it('allows serverSupabaseUser outside server/services (auth helper, not db access)', async () => {
+    const messages = await lintCode(
+      "export default defineEventHandler(async (event) => {\n  const user = await serverSupabaseUser(event)\n  return user\n})\n",
+      'server/api/wallet/index.get.ts',
+    )
+    expect(ruleIds(messages)).not.toContain('no-restricted-syntax')
+  })
+
+  it('allows shared/ importing from ~~/shared/**', async () => {
+    const messages = await lintCode(
+      "import { REGEXES } from '~~/shared/constants/regexes'\nexport const x = REGEXES\n",
+      'shared/models/wallet/wallet.ts',
+    )
+    expect(ruleIds(messages)).not.toContain('no-restricted-imports')
+  })
 })

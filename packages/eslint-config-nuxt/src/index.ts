@@ -37,7 +37,7 @@ export default function nuxtConventions(): Linter.Config[] {
       rules: {
         'no-restricted-imports': ['error', {
           patterns: [{
-            group: ['**/app/**', '**/server/**', '~/**', '~~/**', '#imports'],
+            group: ['**/app/**', '**/server/**', '~/**', '~~/**', '!~~/shared', '!~~/shared/**', '#imports'],
             message: 'shared/ must not depend on app/ or server/.',
           }],
         }],
@@ -68,7 +68,7 @@ export default function nuxtConventions(): Linter.Config[] {
       ignores: ['server/services/**'],
       rules: {
         'no-restricted-syntax': ['error', {
-          selector: 'CallExpression[callee.name=/^serverSupabase/]',
+          selector: 'CallExpression[callee.name=/^serverSupabase(Client|ServiceRole)$/]',
           message: DB_MESSAGE,
         }],
       },

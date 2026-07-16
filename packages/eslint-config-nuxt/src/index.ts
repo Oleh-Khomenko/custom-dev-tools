@@ -1,4 +1,5 @@
 import type { Linter } from 'eslint'
+import checkFile from 'eslint-plugin-check-file'
 
 const HTTP_MESSAGE = 'HTTP calls live only in app/api/*.api.ts client modules.'
 const DB_MESSAGE = 'Database access lives only in server/services/*.service.ts.'
@@ -69,6 +70,23 @@ export default function nuxtConventions(): Linter.Config[] {
         'no-restricted-syntax': ['error', {
           selector: 'CallExpression[callee.name=/^serverSupabase/]',
           message: DB_MESSAGE,
+        }],
+      },
+    },
+    {
+      name: 'nuxt-conventions/filenames',
+      files: ['app/**/*.{ts,vue}', 'server/**/*.ts', 'shared/**/*.ts'],
+      plugins: { 'check-file': checkFile },
+      rules: {
+        'check-file/filename-naming-convention': ['error', {
+          'app/components/**/*.vue': 'PASCAL_CASE',
+          'app/composables/**/*.ts': 'use-+([a-z0-9-])',
+          'app/api/**/*.ts': '+([a-z0-9-]).api',
+          'app/queries/**/*.ts': '+([a-z0-9-]).queries',
+          'app/stores/**/*.ts': 'KEBAB_CASE',
+          'app/utils/**/*.ts': '+([a-z0-9.-])',
+          'server/services/**/*.ts': '+([a-z0-9-]).service',
+          'shared/**/*.ts': '+([a-z0-9.-])',
         }],
       },
     },

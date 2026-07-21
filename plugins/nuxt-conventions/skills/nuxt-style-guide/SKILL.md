@@ -85,6 +85,8 @@ duplicate a type on one side — import it from `shared/`.
 - Server messages, validation errors, shared vocabulary: global
   `/i18n/locales/<lang>.ts`.
 - Never hardcode user-facing strings.
+- `createError()` never takes a raw string — use a `ServerMessageTypes` enum
+  value the client resolves to a localized message.
 
 ## UI patterns
 
@@ -96,6 +98,50 @@ duplicate a type on one side — import it from `shared/`.
   colors or font sizes in components.
 - Before creating a component, check `app/components/common/` for one that
   already fits (Button, Input, Select, Modal, Toast, ...).
+
+## Comments
+
+- Comments are primarily **section headers** that mark the `<script setup>`
+  sections below (`// props`, `// computed`, `// helpers`, ...).
+- An inline comment is allowed ONLY for a non-obvious **WHY** — a hidden
+  constraint, subtle invariant, workaround, or surprising behaviour. Never
+  restate WHAT the code does.
+- Never reference the task, fix, or callers (`// added for X`,
+  `// future enhancement`, `// follow-up`, `// used by Y`) — that belongs in
+  the commit/PR, not the code.
+- No JSDoc / doc-blocks unless a tool requires them.
+- `nuxt.config.ts`: terse one-word section labels only (`// modules`,
+  `// eslint`) — never rationale paragraphs.
+
+## `<script setup>` section order
+
+Use these comment headers as section markers; skip sections that don't apply.
+
+**Imports** (top, in order): `// utils` (external libs) · `// components` ·
+`// api` · `// queries` · `// stores` · `// helpers` · `// models` (type
+imports) · `// constants`
+
+**Declarations**: `// custom models` (local Props/Emits interfaces) ·
+`// custom types` · `// custom constants` · `// props` (before emits) ·
+`// emits` · `// models` (defineModel) · `// common` (useI18n / stores /
+useRoute) · `// refs` (state) · `// template refs` · `// data` (await
+useAsyncData / useQuery) · `// computed` · `// watchers` · `// helpers`
+(function declarations; `// methods` also acceptable) · `// expose`
+
+Pinia store inside `defineStore(name, () => { ... })`: `// common` · `// refs`
+· `// computed` · `// helpers` · `// async helpers`, then `return { ... }` and
+`export default useFooStore;` at the end.
+
+`vue/define-macros-order` requires `defineProps`/`defineEmits` at the very top
+(after imports and `interface` type defs). So local `interface Props`/`Emits`
+under `// custom models` may precede the macros, but runtime `// custom
+constants` must come AFTER `// props` / `// emits`.
+
+- Interface fields use **semicolons**, never commas.
+- Emits (strict): never inline `defineEmits<{...}>()` — extract an
+  `interface Emits` under `// custom models`.
+- Explicit return types on top-level functions, async helpers, and computeds;
+  `function` declarations (not `const` arrows) for top-level handlers.
 
 ## Tooling
 
